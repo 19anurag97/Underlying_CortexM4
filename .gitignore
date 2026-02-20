@@ -1,0 +1,45 @@
+# STM32CubeIDE (Eclipse-based) project files
+.settings/
+.metadata/
+.cproject
+.project
+
+# Build output directories
+/Debug/
+/Release/
+/build/
+/bin/
+/out/
+
+# Object and binary files (generated)
+*.o
+*.elf
+*.map
+*.hex
+*.bin
+*.lst
+
+# Debugger and launch configs
+*.launch
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+*.swo
+
+# IDE-specific configs
+.vscode/
+.idea/
+*.user
+*.sln
+
+# Generated libraries
+*.a
+*.lib
+*.so
+*.dll
+
+# Keep linker scripts and CubeMX configuration tracked
+!*.ld
+!*.ioc
