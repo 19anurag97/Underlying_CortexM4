@@ -24,8 +24,16 @@ the Link Register (LR) doesn’t hold a normal return address.
 Instead, it is loaded with a special “EXC_RETURN” value — which looks like a “negative” value because its high bits are set.  
 *(e.g., 0xFFFFFFF9, 0xFFFFFFFD, 0xFFFFFFF1)*.  
   
-Write a program to get **CONTROL Register** Info.  
+(A) Write a program to get **CONTROL Register** Info.  
 - Gives info about access levels and Stack pointer use.  
 ![alt text](image.png)  
+  
+(B) Switch Privilege to UnPrivilege access level.  
+  
+(C) Lets change:  
+SP -> PSP for thread mode.  [Application]  
+SP -> MSP for handler mode. [Interrupts/Exceptions]  
+  
+With this setup, your Thread mode code runs on PSP, while interrupts continue to use MSP. This mirrors how industrial RTOSes manage stacks.  
   
 

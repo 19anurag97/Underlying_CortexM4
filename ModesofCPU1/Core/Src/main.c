@@ -8,6 +8,8 @@ void generate_interrupt(void);
 void RTC_WKUP_IRQHandler(void);
 void GetControlRegInfo(void);
 void PrintControlRegInfo(void);
+void change_access_level_unpriv(void);
+void Activity1(void);
 /**
   * @brief  The application entry point.
   * @retval int
@@ -25,22 +27,76 @@ int main(void)
   /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
 
-  //Check CONTROL Register info.
-  GetControlRegInfo();
-  PrintControlRegInfo();
-
-  printf("In thread mode : before interrupt\n");
-
-  generate_interrupt();
-  PrintControlRegInfo();
-
-  printf("In thread mode : after interrupt\n");
-
+  /* This activity does
+     -> Change Privilege access to Un-privilege access.
+     -> take snapshot of CONTROL Reg, save it in global var.
+     -> if generate_interrupt or Printf gets called,
+     -> it will result in hardfault exception.
+     -> again change access level to Privilege access.
+     -> then use printf or enable/disable irq in code.
+     -> print previous & current CONTROL reg values. 
+  */
+  Activity1();
+  
   /* Infinite loop */
   while (1)
   {
 
   }
+}
+
+
+void Activity1(void)
+{
+  printf("#################################\n");
+  printf("In thread mode : before interrupt\n");
+  
+  GetControlRegInfo();
+  PrintControlRegInfo();
+
+  //Change access level to Un-Privileged.
+  change_access_level_unpriv();
+  
+  //Save CONTROL Register info.
+  GetControlRegInfo();
+  
+  /*This will not work in Unprivileged mode.(SWV hardfault)*/
+  //PrintControlRegInfo(); 
+  //generate_interrupt();
+
+  //Change access level to Privileged.
+  __asm volatile("SVC #2");
+
+  PrintControlRegInfo(); //This will print Snapshot info saved when device is in unprivileged level.
+
+  //Check CONTROL Register info.
+  GetControlRegInfo();
+
+  PrintControlRegInfo(); //This will print current info of CONTROL reg.
+
+}
+
+void SVC_Handler(void)
+{
+  printf("In SVC Handler.\n");
+  //read
+	__asm volatile ("MRS R0,CONTROL");
+	//modify
+	__asm volatile ("BIC R0,R0,#0x01");
+	//write
+	__asm volatile ("MSR CONTROL,R0");
+}
+
+void change_access_level_unpriv(void)
+{
+  printf("Changing to Unprivileged Access Level.\n");
+	//read
+	__asm volatile ("MRS R0,CONTROL");
+	//modify
+	__asm volatile ("ORR R0,R0,#0x01");
+	//write
+	__asm volatile ("MSR CONTROL,R0");
+
 }
 
 void PrintControlRegInfo(void)

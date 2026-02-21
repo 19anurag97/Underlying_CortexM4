@@ -1,8 +1,0 @@
-../Core/Src/main.c:15:5:main	1
-../Core/Src/main.c:46:6:PrintControlRegInfo	4
-../Core/Src/main.c:67:6:GetControlRegInfo	1
-../Core/Src/main.c:72:6:generate_interrupt	1
-../Core/Src/main.c:85:6:RTC_WKUP_IRQHandler	1
-../Core/Src/main.c:95:6:SystemClock_Config	3
-../Core/Src/main.c:141:6:PeriphCommonClock_Config	2
-../Core/Src/main.c:161:6:Error_Handler	1
