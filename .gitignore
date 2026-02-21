@@ -43,3 +43,8 @@
 # Keep linker scripts and CubeMX configuration tracked
 !*.ld
 !*.ioc
+
+# Analysis and debug artifacts
+*.cyclo
+*.su
+*.list

@@ -1,11 +1,13 @@
 #include "main.h"
 
+volatile uint32_t control_snapshot = 0U; //Stores value of CONTROL Register.
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
 void generate_interrupt(void);
 void RTC_WKUP_IRQHandler(void);
-
+void GetControlRegInfo(void);
+void PrintControlRegInfo(void);
 /**
   * @brief  The application entry point.
   * @retval int
@@ -23,9 +25,14 @@ int main(void)
   /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
 
+  //Check CONTROL Register info.
+  GetControlRegInfo();
+  PrintControlRegInfo();
+
   printf("In thread mode : before interrupt\n");
 
   generate_interrupt();
+  PrintControlRegInfo();
 
   printf("In thread mode : after interrupt\n");
 
@@ -36,10 +43,36 @@ int main(void)
   }
 }
 
-void generate_interrupt()
+void PrintControlRegInfo(void)
 {
-	 volatile uint32_t * const pSTIR  = (uint32_t*)0xE000EF00;
-	 volatile uint32_t * const pISER0 = (uint32_t*)0xE000E100;
+  if (control_snapshot & (1 << 0)) {
+	    printf("Unprivileged Access Level.\n");
+	} 
+  else {
+	    printf("Privileged Access Level.\n");
+	}
+
+	if (control_snapshot & (1 << 1)) {
+	    printf("Stack pointer: PSP in use\n");
+	}
+  else {
+	    printf("Stack pointer: MSP in use\n");
+	}
+
+	if (control_snapshot & (1 << 2)) {
+	    printf("FPU context active\n");
+	}
+}
+
+void GetControlRegInfo(void)
+{
+	control_snapshot = __get_CONTROL();  // CMSIS intrinsic
+}
+
+void generate_interrupt(void)
+{
+	volatile uint32_t * const pSTIR  = (uint32_t*)0xE000EF00;
+	volatile uint32_t * const pISER0 = (uint32_t*)0xE000E100;
 
 	//enable IRQ3 interrupt
 	*pISER0 |= ( 1 << 3);
@@ -51,6 +84,7 @@ void generate_interrupt()
 /* This function(ISR) executes in HANDLER MODE of the processor */
 void RTC_WKUP_IRQHandler(void)
 {
+  GetControlRegInfo();
 	printf("In handler mode : ISR\n");
 }
 
