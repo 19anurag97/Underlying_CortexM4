@@ -37,3 +37,22 @@ SP -> MSP for handler mode. [Interrupts/Exceptions]
 With this setup, your Thread mode code runs on PSP, while interrupts continue to use MSP. This mirrors how industrial RTOSes manage stacks.  
   
 
+**Memory**  
+In this STM board, 1Mbyte of flash memory, 256 Kbytes of SRAM 
+  
+**Usable size = End address - Origin address + 1**  
+- Usable flash size = End address - Origin address + 1
+0x08000000 + (512*1024) =  808 0000(in decimal: 262,136 bytes)  
+808 0000 -  0x08000000 =  8 0000 + 1 (in dec: 5,24,289)  
+divide by 1024 -> 512kb SRAM  
+  
+- Usable ram size = End address - Origin address + 1  
+2004 0000 - 2000 0008 =   3 FFF8 (in decimal: 262,136 bytes)  
+divide by 1024 -> 255Kb SRAM  
+  
+![alt text](image-3.png)
+
+  
+  
+  
+
