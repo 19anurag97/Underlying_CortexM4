@@ -1,6 +1,17 @@
 #include "main.h"
 
+/* RAM partitioning ----------------------------------------------------------*/
+#define SRAM_START 				   0x20000008U
+#define SRAM_SIZE  				   (128 * 1024)
+#define SRAM_END  				   ( (SRAM_START) + (SRAM_SIZE) )
+#define STACK_START          SRAM_END
+
+#define STACK_MSP_START 		 STACK_START
+#define STACK_MSP_END   		 (STACK_MSP_START - 512)
+#define STACK_PSP_START 		 STACK_MSP_END
+
 volatile uint32_t control_snapshot = 0U; //Stores value of CONTROL Register.
+
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
@@ -10,6 +21,8 @@ void GetControlRegInfo(void);
 void PrintControlRegInfo(void);
 void change_access_level_unpriv(void);
 void Activity1(void);
+__attribute__((naked)) void change_sp_to_psp(void);
+
 /**
   * @brief  The application entry point.
   * @retval int
@@ -27,11 +40,12 @@ int main(void)
   /* Configure the peripherals common clocks */
   PeriphCommonClock_Config();
 
+  change_sp_to_psp();
+
   /* This activity does
      -> Change Privilege access to Un-privilege access.
      -> take snapshot of CONTROL Reg, save it in global var.
-     -> if generate_interrupt or Printf gets called,
-     -> it will result in hardfault exception.
+     -> if generate_interrupt or Printf gets called.
      -> again change access level to Privilege access.
      -> then use printf or enable/disable irq in code.
      -> print previous & current CONTROL reg values. 
@@ -45,11 +59,23 @@ int main(void)
   }
 }
 
+/* this function changes SP to PSP */
+__attribute__((naked)) void change_sp_to_psp(void)
+{
+	__asm volatile(".equ SRAM_END, (0x20000000 + ( 128 * 1024))");
+	__asm volatile(".equ PSP_START , (SRAM_END-512)");
+	__asm volatile("LDR R0,=PSP_START");
+	__asm volatile("MSR PSP, R0");
+	__asm volatile("MOV R0,#0X02");
+	__asm volatile("MSR CONTROL,R0");
+	__asm volatile("BX LR");
+}
+
 
 void Activity1(void)
 {
   printf("#################################\n");
-  printf("In thread mode : before interrupt\n");
+  printf("In Thread mode : before interrupt\n");
   
   GetControlRegInfo();
   PrintControlRegInfo();
@@ -59,13 +85,29 @@ void Activity1(void)
   
   //Save CONTROL Register info.
   GetControlRegInfo();
-  
-  /*This will not work in Unprivileged mode.(SWV hardfault)*/
+
+  /*
+   *
+   * Run Code in Thread mode Unprivileged Access. 						   (1)
+   *
+   */
+
+  /*This will not work in Unprivileged mode.(SWV Hard fault)*/
   //PrintControlRegInfo(); 
   //generate_interrupt();
 
-  //Change access level to Privileged.
+  /*
+   * Generate an SVC instruction to change,
+   * Thread mode Unprivileged Access into Privileged Access. 			(2)
+   *
+   */
   __asm volatile("SVC #2");
+
+  /*
+   *
+   * Run Code in Thread mode Privileged Access. 						      (3)
+   *
+   */
 
   PrintControlRegInfo(); //This will print Snapshot info saved when device is in unprivileged level.
 
@@ -78,8 +120,8 @@ void Activity1(void)
 
 void SVC_Handler(void)
 {
-  printf("In SVC Handler.\n");
-  //read
+	//printf("In SVC Handler.\n"); Here code is in Privilege access mode.
+	//Below instructrions change access to Privilege mode.
 	__asm volatile ("MRS R0,CONTROL");
 	//modify
 	__asm volatile ("BIC R0,R0,#0x01");
@@ -89,7 +131,7 @@ void SVC_Handler(void)
 
 void change_access_level_unpriv(void)
 {
-  printf("Changing to Unprivileged Access Level.\n");
+  //printf("Changing to Unprivileged Access Level.\n");
 	//read
 	__asm volatile ("MRS R0,CONTROL");
 	//modify
