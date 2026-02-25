@@ -64,42 +64,21 @@ void PeriphCommonClock_Config(void);
   */
 int main(void)
 {
-
-  /* USER CODE BEGIN 1 */
   //1. Manually pend the pending bit for the USART1 IRQ number in NVIC
 	uint32_t *pISPR1 = (uint32_t*)0XE000E204; //0XE000E200+4
-	*pISPR1 |= ( 1 << (USART1_IRQNO % 32));
+
+  /*Why %32? Because each ISPR register is 32 bits wide,
+    so we need to find the correct bit position within the register for the given IRQ number.*/
+  *pISPR1 |= ( 1 << (USART1_IRQNO % 32));
 
 	//2. Enable the USART1 IRQ number in NVIC
 	uint32_t *pISER1 = (uint32_t*)0xE000E104; //0xE000E100+4
 	*pISER1 |= ( 1 << (USART1_IRQNO % 32));
 
-  /* USER CODE END 1 */
-
-  /* MCU Configuration--------------------------------------------------------*/
-
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
-
-  /* USER CODE BEGIN Init */
-
-  /* USER CODE END Init */
-
-  /* Configure the system clock */
-  SystemClock_Config();
-
-  /* Configure the peripherals common clocks */
-  PeriphCommonClock_Config();
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
   while (1)
   {
 
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
   }
-  /* USER CODE END 3 */
 }
 
 void USART1_IRQHandler(void)

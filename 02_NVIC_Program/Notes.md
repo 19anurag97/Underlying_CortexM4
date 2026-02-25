@@ -26,9 +26,13 @@ Steps:
 ![alt text](image-1.png)
   
 
-2. Program the processor register to enable that IRQ.  
+2. Program the processor register to enable that IRQ.
 3. Configure the peripheral configuration register. Wheneve pkt is rcvd, it will automatically issue an
    interrupt on IRQ line 36.
+
+![alt text](image-3.png)
+
+
 4. When the interrupt is issued on the IRQ line, it will get pended in the pending register of the processor.
 5. NVIC will allow the IRQ handler associated with the IRQ num to run only if the priority of the new interrupt
    is higher than currently executing Interrupt handler. Otherwise newly arrived interrupt will stay in pending state.
