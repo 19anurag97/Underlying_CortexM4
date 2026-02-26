@@ -48,3 +48,7 @@
 *.cyclo
 *.su
 *.list
+
+# Ignore DSPractice folder and all .zip files
+DSPractice/
+*.zip
