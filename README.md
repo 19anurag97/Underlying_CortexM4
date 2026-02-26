@@ -28,7 +28,7 @@ STM32_LearningProject/
 │   ├── Debug/            # Build outputs
 │   ├── Drivers/          # HAL and BSP drivers
 │   └── Notes.md          # Documentation for this milestone
-├── ModesofCPU1/          # CPU modes and privilege separation
+├── 01_Modes_Stack_Program/ # CPU modes, stack pointer, privilege separation
 │   ├── Core/Inc/
 │   ├── Core/Src/
 │   ├── Startup/
