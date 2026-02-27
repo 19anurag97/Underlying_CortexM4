@@ -15,8 +15,12 @@ void MPU_Config(void);
 void EnableFaultExceptions(void);
 void GetFault(uint8_t faultType);
 void GlobalFault_Handler_c(uint32_t *pMSP, const char *faultName);
-int fun_divide(int x , int y);
 
+// Fault-inducing functions.
+int fun_divide(int x , int y);
+void MergeSort(uint8_t l, uint8_t h, uint8_t a[]);
+
+// Fault handlers prototypes
 void HardFault_Handler(void);
 void UsageFault_Handler(void);
 void MemManage_Handler(void);

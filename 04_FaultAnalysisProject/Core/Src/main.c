@@ -4,11 +4,11 @@
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
-void GlobalFault_Handler_c(uint32_t *pMSP, const char *faultName);
+// void GlobalFault_Handler_c(uint32_t *pMSP, const char *faultName);
 
-void EnableFaultExceptions(void);
-void GetFault(uint8_t faultType);
-int  fun_divide(int x , int y);
+// void EnableFaultExceptions(void);
+// void GetFault(uint8_t faultType);
+// int  fun_divide(int x , int y);
 /* ----------------------------------------------*/
 
 
@@ -32,7 +32,7 @@ int main(void)
   EnableFaultExceptions();
 
   //GetFault(0); // Trigger a divide by zero fault
-  GetFault(3);
+  GetFault(2);
 
   for(;;);
 

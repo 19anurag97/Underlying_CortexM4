@@ -37,7 +37,10 @@ void GetFault(uint8_t faultType) {
       *ptr = 0xDEADBEEF;
       break; }
     case 2:
-      // Faulty merge sort placeholder
+        //Usage Fault due to infinite recursion (stack overflow)
+      uint8_t a[] = {5, 2, 8, 1, 9, 3, 7, 4, 6, 19, 11};
+      int size = sizeof(a)/sizeof(a[0]);
+      MergeSort(0, (size-1), a);
       break;
     case 3: {//Memory Management Fault due to MPU violation
       volatile uint32_t *forbidden = (uint32_t*)0x20001000;
